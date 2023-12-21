@@ -12,3 +12,4 @@ install
 4. lalu ketik npm init -y (enter terus)
 5. lalu npm install express
 6. lalu npm install mongodb
+7. untuk file db.js ubah uri, username, password, dan database sesuai dengan milik kalian masing-masing
