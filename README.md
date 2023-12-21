@@ -5,6 +5,8 @@ install
   
 - postman
 - nodejs
+![image](https://github.com/nimadetaniar/bookrookies/assets/31611338/8f62e3b7-17e4-41f9-9f8c-3fde6c8c049a)
+
 
 1. buat folder baru
 2. lalu klik kanan "open with  Code" yang berlogo vscode
