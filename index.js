@@ -6,6 +6,7 @@ const port = 3000;
 
 //import file book yang berisikan fungsi2 yang diexport
 const book = require('./model/book')
+const renter = require('./model/renter')
 
 // membuat express dapat menerima request body berupa JSON
 app.use(express.json())
@@ -35,6 +36,8 @@ app.get("/books", async (req, res) => {
   2. Query parameters ditandai dengan simbol ?nama_param=value
 */
 // curl -X GET http://localhost:3000/books/1
+
+
 app.get("/books/:id", async (req, res) => {
     const id = parseInt(req.params.id)
 
@@ -50,7 +53,6 @@ app.get("/books/:id", async (req, res) => {
 
     res.json(_book);
 })
-
 
 // curl -X POST http://localhost:3000/books --header "Content-Type: application/json" --data '{"title": "test", "author": "test"}'
 app.post("/books", async (req, res) => {
@@ -105,10 +107,11 @@ app.put("/books/:id", async (req, res) => {
         }
 
         // mencari buku terlebih dahulu yang mau diupdate
+
         const thatBook = await book.fetchOneData(id)
 
         //cek jika bukunya tidak ada, memakai array indeks pertama karena hasil fetch data berupa to array
-        if (thatBook[0] === null) {
+        if (!thatBook) {
             res.status(404)
             res.json("Book not found!")
             return
@@ -116,19 +119,20 @@ app.put("/books/:id", async (req, res) => {
 
         // di validasi dulu apakah author diberikan di req.body, kalau tidak, tidak perlu di update biar tidak null hasilnya
         if (author) {
-            thatBook[0].author = author
+            thatBook.author = author
         }
 
         // title di validasi dulu apakah title diberikan di req.body, kalau tidak, tidak perlu di update biar tidak null hasilnya
         if (title) {
-            thatBook[0].title = title
+            thatBook.title = title
         }
 
-        await book.updateData(thatBook[0])
+        await book.updateData(thatBook)
 
-        res.json(thatBook[0]);
+        res.json(thatBook);
     } catch (error) {
         res.status(422)
+        console.log('error', error)
         res.json('tidak dapat update buku')
     }
 
@@ -144,7 +148,7 @@ app.delete("/books/:id", async (req, res) => {
         const thatBook = await book.fetchOneData(id)
 
         //cek jika bukunya tidak ada, memakai array indeks pertama karena hasil fetch data berupa to array
-        if (thatBook[0] === null) {
+        if (!thatBook) {
             res.status(404)
             res.json("Book not found!")
             return
@@ -157,6 +161,36 @@ app.delete("/books/:id", async (req, res) => {
         res.json('tidak dapat delete buku')
     }
 
+})
+
+app.put("/renter/:id", async (req, res) => {
+    const id = parseInt(req.params.id)
+    const books = req.body
+    const renterBook = (await renter.fetchOneData(id)).books
+    let _books = renterBook
+
+    try {
+        for (let i = 0; i < books.length; i++) {
+            let _book = await book.fetchOneData(books[i].id);
+
+            //jika buku tidak ada
+            if (_book.length === 0) {
+                // HTTP Status bisa baca di https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
+                res.status(404)
+                res.json('book not found')
+                return
+            }
+            _books.push(_book)
+        }
+
+        const _renter = await renter.updateDataRenterBooks(id, _books)
+
+        res.json(_renter);
+    } catch (error) {
+        res.status(422)
+        console.log('error', error)
+        res.json(`buku tidak`)
+    }
 })
 
 app.listen(port, () => {

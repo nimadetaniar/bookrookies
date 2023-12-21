@@ -7,8 +7,9 @@ async function dropCollection() {
         const db = await mongo.connect();
         console.log("Drop Collection...");
 
-        //drop database
+        //drop database satu2
         await db.collection("books").drop();
+        await db.collection("renter").drop();
 
     } catch (error) {
         console.log(error);

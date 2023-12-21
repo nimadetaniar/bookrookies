@@ -7,32 +7,32 @@ async function insertData(books) {
         console.log("Inserting data...");
 
         //mengisi data book ke table books
-        await db.collection('books').insertMany(books);        
+        await db.collection('renter').insertMany(renter);
     } catch (error) {
         console.log(error);
         throw error
     } finally {
         await mongo.disconnect()
         console.log('finished.')
-      }
+    }
 }
 
 //fungsi mengambil data dari table books
-async function fetchData( searchField, search ) {
+async function fetchData(searchField, search) {
     try {
         const db = await mongo.connect();
-        
+
         if (searchField && search) {
             return await db
-            .collection("books")
-            //penggunaan [] pada key di find, untuk mengekstrasi value dari variabel untuk dijadikan key
-            .find( { [searchField]:  new RegExp(search, 'i')}, { projection: {} })
-            .toArray();
+                .collection("renter")
+                //penggunaan [] pada key di find, untuk mengekstrasi value dari variabel untuk dijadikan key
+                .find({ [searchField]: new RegExp(search, 'i') }, { projection: {} })
+                .toArray();
         } else {
             return await db
-            .collection("books")
-            .find({}, { projection: {} })
-            .toArray();
+                .collection("renter")
+                .find({}, { projection: {} })
+                .toArray();
         }
         //mengambil seluruh data book dari table books
     } catch (error) {
@@ -41,43 +41,46 @@ async function fetchData( searchField, search ) {
     } finally {
         await mongo.disconnect()
         console.log('finished.')
-      }
+    }
 }
 
 //fungsi mengambil 1 data dari table books
-async function fetchOneData( id ) {
+async function fetchOneData(id) {
     try {
         const db = await mongo.connect();
 
         return await db
-            .collection("books")
-            .findOne({id: id}, { projection: {} })
-        
+            .collection("renter")
+            .findOne({ id: id }, { projection: {} })
+
     } catch (error) {
         console.log(error);
         throw error
     } finally {
         await mongo.disconnect()
         console.log('finished.')
-      }
+    }
 }
 
-//fungsi mengupdate data di table books
-async function updateData(book) {
-
+//fungsi mengupdate data di table renter pinjam buku
+async function updateDataRenterBooks(idRenter, books) {
     try {
         const db = await mongo.connect();
         console.log("Update data...");
 
-        await db.collection("books").updateOne(
-            { id: book.id },
+        await db.collection("renter").updateOne(
+            { id: idRenter },
             {
                 $set: {
-                    title: book.title,
-                    author: book.author
+                    books: books,
                 }
+            },
+            {
+                upsert: true
             }
         )
+
+
         return "data updated"
     } catch (error) {
         console.log(error);
@@ -85,26 +88,9 @@ async function updateData(book) {
     } finally {
         await mongo.disconnect()
         console.log('finished.')
-      }
+    }
 }
 
-async function deleteData(id) {
 
-    try {
-        const db = await mongo.connect();
-        console.log("Delete data...");
-
-        await db.collection("books").deleteOne(
-            { id: id }
-        )
-        return "data deleted"
-    } catch (error) {
-        console.log(error);
-        throw error
-    } finally {
-        await mongo.disconnect()
-        console.log('finished.')
-      }
-}
 //mengekspor fungsi-fungsi agar dapat dipakai di file lain yang mengimport book
-module.exports = { insertData, fetchData, updateData, fetchOneData, deleteData }
+module.exports = { insertData, fetchData, fetchOneData, deleteData, updateDataRenterBooks }

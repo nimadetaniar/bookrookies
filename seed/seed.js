@@ -31,6 +31,25 @@ async function seedData() {
                     author: "Nurfitra Pujo Santiko"
                 },
             ]);
+        await db
+            .collection("renter")
+            .insertMany([{
+                "id": 3,
+                "name": "Michael",
+                "birth_date": {
+                  "$date": "1992-07-15T00:00:00.000Z"
+                },
+                "address": "Surabaya"
+              },
+              {
+                "id": 2,
+                "name": "Monica",
+                "birth_date": {
+                  "$date": "2001-01-30T00:00:00.000Z"
+                },
+                "address": "Jakarta"
+              }
+            ]);
 
         //close koneksi db 
         await mongo.disconnect()
