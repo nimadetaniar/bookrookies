@@ -183,6 +183,7 @@ app.put("/renter/:id", async (req, res) => {
             _books.push(_book)
         }
 
+        
         const _renter = await renter.updateDataRenterBooks(id, _books)
 
         res.json(_renter);
